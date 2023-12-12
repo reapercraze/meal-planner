@@ -3,6 +3,8 @@ from django.conf  import settings
 import json
 import os
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
 
 # Load manifest when server launches
 MANIFEST = {}
@@ -21,3 +23,4 @@ def index(req):
         "css_file": "" if settings.DEBUG else MANIFEST["src/main.ts"]["css"][0]
     }
     return render(req, "core/index.html", context)
+
