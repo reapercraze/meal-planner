@@ -16,11 +16,11 @@ const router = createHashRouter([
     path: '',
     element: (
       <section>
-        <div id="app">
-          <App />
-        </div>
         <div id="sign-in">
           <SignIn />
+        </div>
+        <div id="app">
+          <App />
         </div>
       </section>
     ),
