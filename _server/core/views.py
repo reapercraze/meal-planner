@@ -4,6 +4,7 @@ import json
 import os
 from django.contrib.auth.decorators import login_required
 
+
 # Load manifest when server launches
 MANIFEST = {}
 if not settings.DEBUG:
