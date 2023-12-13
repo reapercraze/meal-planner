@@ -15,14 +15,14 @@ const router = createHashRouter([
   {
     path: '',
     element: (
-      <body>
+      <section>
         <div id="app">
           <App />
         </div>
         <div id="sign-in">
           <SignIn />
         </div>
-      </body>
+      </section>
     ),
   },
   {
