@@ -4,8 +4,36 @@ import App from './App.jsx'
 import './index.css'
 import 'vite/modulepreload-polyfill'
 
+import {createHashRouter, RouterProvider} from "react-router-dom";
+import { Home } from './pages/Home.jsx'
+import { CreatePlan } from './pages/CreatePlan.jsx'
+import { SignUp } from './pages/SignUp.jsx'
+import { ViewPlans } from './pages/ViewPlans.jsx'
+
+const router = createHashRouter([
+  {
+    path: "",
+    element: <App/>,
+  },
+  {
+    path: "/home",
+    element: <Home />
+  },
+  {
+    path: "/create_plan",
+    element:  <CreatePlan />
+  },
+  {
+    path: "/sign_up",
+    element: <SignUp />
+  },
+  {
+    path: "/view_plans",
+    element: <ViewPlans />
+  }
+  
+])
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+    <RouterProvider router={router} />
 )
