@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './App.css';
 import { Outlet } from 'react-router-dom';
 
-function App() {
+function App({ style }) {
   const [count, setCount] = useState(0);
 
   async function logout() {
@@ -21,6 +21,7 @@ function App() {
 
   return (
     <>
+    <div>
       <nav>
         <Link to="/home">Home</Link>
         <Link to="/create_plan">Create Plan</Link>
@@ -29,6 +30,7 @@ function App() {
         <button onClick={logout}>Logout</button>
       </nav>
       <Outlet />
+    </div>
     </>
   );
 }
