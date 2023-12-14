@@ -14,7 +14,7 @@ def sign_up(req):
             last_name=req.POST.get("last_name")
         )
         login(req, user)
-        return redirect("/")
+        return redirect("/#/home")
     else:
         return render(req, "registration/sign_up.html")
 
@@ -23,7 +23,7 @@ def sign_in(req):
         user = authenticate(req, username=req.POST.get("email"), password=req.POST.get("password"))
         if user is not None:
             login(req, user)
-            return redirect("/")
+            return redirect("/#/home")
 
         return render(req, "registration/sign_in.html")
     else:
