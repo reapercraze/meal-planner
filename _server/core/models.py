@@ -7,18 +7,19 @@ class Recipe(models.Model):
     api_id = models.IntegerField(unique=True)
     
 class MealDay(models.Model):
-    breakfast_recipe = models.ForeignKey(Recipe, related_name='breakfast_meal', null=True, on_delete=models.SET_NULL)
-    lunch_recipe = models.ForeignKey(Recipe, related_name='lunch_meal', null=True, on_delete=models.SET_NULL)
-    dinner_recipe = models.ForeignKey(Recipe, related_name='dinner_meal', null=True, on_delete=models.SET_NULL)
+    breakfast_recipe = models.ForeignKey(Recipe, null=True, on_delete=models.SET_NULL)
+    lunch_recipe = models.ForeignKey(Recipe, null=True, on_delete=models.SET_NULL)
+    dinner_recipe = models.ForeignKey(Recipe, null=True, on_delete=models.SET_NULL)
     
 class MealWeek(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    monday = models.ForeignKey(MealDay, related_name='monday_meals', on_delete=models.CASCADE, null=True)
-    tuesday = models.ForeignKey(MealDay, related_name='tuesday_meals', on_delete=models.CASCADE, null=True)
-    wednesday = models.ForeignKey(MealDay, related_name='wednesday_meals', on_delete=models.CASCADE, null=True)
-    thursday = models.ForeignKey(MealDay, related_name='thursday_meals', on_delete=models.CASCADE, null=True)
-    friday = models.ForeignKey(MealDay, related_name='friday_meals', on_delete=models.CASCADE, null=True)
-    saturday = models.ForeignKey(MealDay, related_name='saturday_meals', on_delete=models.CASCADE, null=True)
-    sunday = models.ForeignKey(MealDay, related_name='sunday_meals', on_delete=models.CASCADE, null=True)
+    title = models.CharField(max_length=255)
+    monday = models.ForeignKey(MealDay, on_delete=models.CASCADE)
+    tuesday = models.ForeignKey(MealDay, on_delete=models.CASCADE)
+    wednesday = models.ForeignKey(MealDay, on_delete=models.CASCADE)
+    thursday = models.ForeignKey(MealDay, on_delete=models.CASCADE)
+    friday = models.ForeignKey(MealDay, on_delete=models.CASCADE)
+    saturday = models.ForeignKey(MealDay, on_delete=models.CASCADE)
+    sunday = models.ForeignKey(MealDay, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
