@@ -1,32 +1,35 @@
-{% extends "registration/base.html"%}
+{% extends "registration/base.html" %}
 
 {% block content %}
-<form action="/registration/sign_up/" method="post">
-  {% csrf_token %}
-  <div>
-    <label>
-      First Name
-      <input type="text" name="first_name">
-    </label>
-  </div>
-  <div>
-    <label>
-      Last Name
-      <input type="text" name="last_name">
-    </label>
-  </div>
-  <div>
-    <label>
-      Email
-      <input type="email" name="email">
-    </label>
-  </div>
-  <div>
-    <label>
-      Password
-      <input type="password" name="password">
-    </label>
-  </div>
-  <button>Create Account</button>
-</form>
+<div class="signin-container">
+    <h1 class="signin-header">Create Account</h1>
+    <form action="/registration/sign_up/" method="post" class="input-container">
+        {% csrf_token %}
+        <div>
+            <label>
+                <input type="text" name="first_name" class="input-field" placeholder="First Name">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="text" name="last_name" class="input-field" placeholder="Last Name">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="email" name="email" class="input-field" placeholder="Email">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="password" name="password" class="input-field" placeholder="Password">
+            </label>
+        </div>
+        <button class="signin-button">Create Account</button>
+    </form>
+    <span>
+      Already have an account? 
+      <a href="/registration/sign_in/" class="signup-link">Sign In</a>
+    </span>
+</div>
 {% endblock %}

@@ -7,7 +7,7 @@ import 'vite/modulepreload-polyfill';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Home } from './pages/Home.jsx';
 import { CreatePlan } from './pages/CreatePlan.jsx';
-import { SignIn } from './pages/SignIn.jsx';
+import { About } from './pages/About.jsx';
 import { SignUp } from './pages/SignUp.jsx';
 import { ViewPlans } from './pages/ViewPlans.jsx';
 
@@ -17,7 +17,7 @@ const router = createHashRouter([
     element: (
       <section>
         <div id="sign-in">
-          <SignIn />
+          <About />
         </div>
         <div id="app">
           <App />

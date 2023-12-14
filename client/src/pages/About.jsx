@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import React from "react";
-import '../styles/SignIn.css';
+import '../styles/About.css';
 
-export function SignIn() {
+export function About() {
     return (
         <div className="container">
             <div className="signin-container">
