@@ -1,6 +1,4 @@
-import { Link } from 'react-router-dom';
 import './App.css';
-import { Outlet } from 'react-router-dom';
 
 function App() {
 
@@ -17,41 +15,11 @@ function App() {
     }
   }
 
-  async function sign_in() {
-    const res = await fetch("/registration/sign_in/", {
-      credentials: "same-origin", // include cookies!
-    });
-    if (res.ok) {
-      window.location = "/registration/sign_in/"
-    } else {
-      console.error('Failed to fetch data');
-    }
-  }
-
-  async function sign_up() {
-    const res = await fetch("/registration/sign_up/", {
-      credentials: "same-origin", // include cookies!
-    });
-    if (res.ok) {
-      window.location = "/registration/sign_up"
-    } else {
-      console.error('Failed to fetch data');
-    }
-  }
-
 
   return (
     <>
     <div>
-      <nav>
-        <Link to="/home">Home</Link>
-        <Link to="/create_plan">Create Plan</Link>
-        <Link to="/view_plans">View Plans</Link>
-        <button onClick={sign_in}>Sign In</button>
-        <button onClick={sign_up}>Sign Up</button>
-        <button onClick={logout}>Logout</button>
-      </nav>
-      <Outlet />
+      This is where the random recipe will appear?
     </div>
     </>
   );
