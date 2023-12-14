@@ -72,11 +72,17 @@ def get_meal(req):
 def add_recipe(req):
     #add recipe to meal day
     body = json.loads(req.body)
+    meal_day_id = body["meal_day"]
+    day = MealDay.objects.get(id=meal_day_id)
+    meal = body["meal"]
     
     recipe = Recipe(
         title=body["title"],
         api_id=body["api_id"]
     )
+    
+    day
+    
     recipe.save()
     return JsonResponse({"recipe": recipe})
 
