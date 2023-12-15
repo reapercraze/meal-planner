@@ -37,12 +37,12 @@ background-color: wheat;
 }
 
 .container {
-  margin-top: 10vh;
   margin-left: 15px;
 }
 
 .date {
   color: black;
+  margin-bottom: 40px;
 }
 
 .info {
@@ -52,6 +52,11 @@ background-color: wheat;
   justify-content: center;
   text-align: center;
   width: 100vw;
+  margin-bottom: 50vh;
+}
+
+.meal {
+  font-size: 49px;
 }
 
 
