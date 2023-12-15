@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import styles from '../styles/ViewPlans.module.css';
+import { makeRequest } from './utils/make_request';
 
 export function ViewPlans() {
   const [currentWeek, setCurrentWeek] = useState(getMostRecentMonday());
@@ -11,31 +12,21 @@ export function ViewPlans() {
   }, [currentWeek]);
 
   async function fetchMealPlans() {
-    const csrfToken = document.cookie.split("; ").find(row => row.startsWith("csrftoken=")).split("=")[1];
-  
     try {
-      const response = await fetch('/get_meal_plan/', {
-        credentials: "same-origin",
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify({
-          currentWeek: currentWeek.toISOString(),
-        }),
+      const responseJson = await makeRequest('/get_meal_plan/', method='post', 
+      body = {
+        currentWeek: currentWeek.toISOString()
       });
   
-      if (response.ok) {
-        const data = await response.json();
-        setMealWeeks(data.meal_weeks);
+      if (!responseJson.error) {
+        setMealWeeks(responseJson.meal_weeks);
       } else {
-        console.error(`Failed to fetch meal plans. Status code: ${response.status}`);
+        console.error(`Failed request. Status code: ${responseJson.status}`);
       }
     } catch (error) {
-      console.error('Error fetching meal plans:', error);
+      console.error('Error fetching meal weeks:', error);
     }
-  }
+  };
   
 
   async function createNewWeek() {
@@ -60,16 +51,15 @@ export function ViewPlans() {
         body: JSON.stringify({
           title: weekTitle,
         }),
-      });
+
   
-      if (response.ok) {
-        const data = await response.json();
-        setMealWeeks([...mealWeeks, data.meal_week]);
+      if (!responseJson.error) {
+        setMealWeeks([...mealWeeks, responseJson.meal_week]);
       } else {
-        console.error(`Failed to create a new week. Status code: ${response.status}`);
+        console.error(`Failed request. Status code: ${responseJson.status}`);
       }
     } catch (error) {
-      console.error('Error creating a new week:', error);
+      console.error('Error Failed to create a new week:', error);
     }
   }
   

@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom'
 import styles from '../styles/Home.module.css';
+import { makeRequest } from '../utils/make_request';
 
 export function Home() {
 
   const [dateTime, setDateTime] = useState(new Date());
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setDateTime(new Date());
     }, 1000);
 
+    getUser();
     return () => clearInterval(intervalId);
   }, []);
 
@@ -24,6 +27,21 @@ export function Home() {
       window.location = "/registration/sign_in/";
     } else {
       console.error("This was a stupid request")
+    }
+  }
+
+  async function getUser() {
+    try {
+      const responseJson = await makeRequest('/user/');
+  
+      if (!responseJson.error) {
+        console.log(responseJson)
+        setUser(responseJson.user.first_name + " " + responseJson.user.last_name);
+      } else {
+        console.error(`Failed request. Status code: ${responseJson.status}`);
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
     }
   }
 
@@ -45,7 +63,7 @@ export function Home() {
       </nav>
       <section className={styles.container}>
         <div className={styles.info}>
-            <h1 className={styles.helloUser}>Hi, User!</h1>
+            <h1 className={styles.helloUser}>Hi, {user}!</h1>
             <p className={styles.date}>
                 Today's Date: {dateTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>

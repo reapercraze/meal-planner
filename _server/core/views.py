@@ -8,6 +8,7 @@ from core.models import MealWeek, MealDay, Recipe
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import requests
+from datetime import datetime, timedelta
 
 # Load manifest when the server launches
 MANIFEST = {}
@@ -38,6 +39,7 @@ def create_meal_week(req):
         
     meal_week = MealWeek(
         user=req.user,
+        monday_date=body["mondayDate"],
         title=body["title"],
         monday=meals[0],
         tuesday=meals[1],
@@ -103,11 +105,18 @@ def search_recipies(req):
     api_key = os.environ.get("SPOONACULAR_API_KEY")
     
     url = f'https://api.spoonacular.com/recipes/complexSearch'
-    query_parms = f'?apiKey={api_key}&query={query}&number=10'
-    url.append(query_parms)
+    params = {
+        'apiKey': api_key,
+        'query': query,
+        'number': 10,
+    }
     
-    response = requests.get(url)
-    print(response.text)
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        recipe_data = response.json()
+        return JsonResponse({"recipe": recipe_data})
+    else:
+        return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
     
 def random_recipe(req):
 
@@ -127,6 +136,17 @@ def random_recipe(req):
     else:
         return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
 
+@login_required
+def me(req):
+    user = req.user
+    return JsonResponse({"user": model_to_dict(user)})
 
 def to_dicts(models):
     return [model_to_dict(model) for model in models]
+
+def get_most_recent_monday():
+    today = datetime.now()
+    day_of_week = today.weekday()  
+    difference = (day_of_week + 6) % 7 
+    most_recent_monday = today - timedelta(days=difference)
+    return most_recent_monday.date() 
