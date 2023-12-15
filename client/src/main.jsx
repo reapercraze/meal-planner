@@ -1,3 +1,4 @@
+// main.jsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
@@ -6,9 +7,9 @@ import 'vite/modulepreload-polyfill';
 
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Home } from './pages/Home.jsx';
-import { CreatePlan } from './pages/CreatePlan.jsx';
 import { About } from './pages/About.jsx';
 import { ViewPlans } from './pages/ViewPlans.jsx';
+import AuthGuard from './AuthGuard.jsx'; // Import AuthGuard
 
 const router = createHashRouter([
   {
@@ -26,15 +27,19 @@ const router = createHashRouter([
   },
   {
     path: '/home',
-    element: <Home />,
-  },
-  {
-    path: '/create_plan',
-    element: <CreatePlan />,
+    element: (
+      <AuthGuard>
+        <Home />
+      </AuthGuard>
+    ),
   },
   {
     path: '/view_plans',
-    element: <ViewPlans />,
+    element: (
+      <AuthGuard>
+        <ViewPlans />
+      </AuthGuard>
+    ),
   },
 ]);
 

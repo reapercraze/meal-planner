@@ -38,7 +38,15 @@ export function ViewPlans() {
   }
   
 
-  async function createNewWeek(currentWeek) {
+  async function createNewWeek() {
+    // Prompt the user for the week title
+    const weekTitle = window.prompt('Enter the name of the week:', 'New Week');
+  
+    if (weekTitle === null) {
+      // User clicked Cancel
+      return;
+    }
+  
     const csrfToken = document.cookie.split("; ").find(row => row.startsWith("csrftoken=")).split("=")[1];
   
     try {
@@ -50,8 +58,7 @@ export function ViewPlans() {
           'X-CSRFToken': csrfToken,
         },
         body: JSON.stringify({
-          title: 'New Week',
-          currentWeek: currentWeek.toISOString(), // Pass the currentWeek as a parameter
+          title: weekTitle,
         }),
       });
   
@@ -132,7 +139,7 @@ export function ViewPlans() {
                 // Display meal plans if available
                 mealWeeks.map((mealWeek) => (
                   <div key={mealWeek.id} className={styles.mealPlan}>
-                    <h2>{mealWeek.user}</h2>
+                    <h2>{mealWeek.title}</h2>
                     {/* Add more details about the meal plan as needed */}
                   </div>
                 ))
