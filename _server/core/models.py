@@ -13,6 +13,7 @@ class MealDay(models.Model):
     
 class MealWeek(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
     monday = models.ForeignKey(MealDay, related_name='monday_meals', on_delete=models.CASCADE, null=True)
     tuesday = models.ForeignKey(MealDay, related_name='tuesday_meals', on_delete=models.CASCADE, null=True)
     wednesday = models.ForeignKey(MealDay, related_name='wednesday_meals', on_delete=models.CASCADE, null=True)

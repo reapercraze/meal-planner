@@ -2,9 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom'
 import styles from '../styles/CreatePlan.module.css';
 
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { makeRequest } from "../utils/make_request";
+
 export function CreatePlan() {
 
   const [currentWeek, setCurrentWeek] = useState(getMostRecentMonday());
+  const navigate = useNavigate()
+  const [title, setTitle] = useState("")
 
   function getMostRecentMonday() {
       const today = new Date();
@@ -40,6 +46,14 @@ export function CreatePlan() {
       setCurrentWeek(nextWeek);
   };
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    await makeRequest("/create_plan/", "post", {title});
+    // TODO make sure request succeeded
+
+    navigate(-1);
+
   return (
     <>
       <nav className={styles.navbar}>
@@ -73,5 +87,5 @@ export function CreatePlan() {
           </div>
         </section>
     </>
-  );
+  }
 }

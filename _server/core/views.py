@@ -3,6 +3,9 @@ from django.conf  import settings
 import json
 import os
 from django.contrib.auth.decorators import login_required
+from core.models import MealWeek, MealDay, Recipe
+from django.forms import model_to_dict
+from django.http import JsonResponse, request
 
 
 # Load manifest when server launches
@@ -22,3 +25,95 @@ def index(req):
         "css_file": "" if settings.DEBUG else MANIFEST["src/main.ts"]["css"][0]
     }
     return render(req, "core/index.html", context)
+
+@login_required
+def create_meal_week(req):
+    body = json.loads(req.body)
+    
+    days = []
+    for day in range(0,7):
+        day = MealDay.create()
+        days.append(day)
+        
+    meal_week = MealWeek(
+        user=req.user,
+        title=body["title"],
+        monday=meals[0],
+        tuesday=meals[1],
+        wednesday=meals[2],
+        thursday=meals[3],
+        friday=meals[4],
+        saturday=meals[5],
+        sunday=meals[6],
+    )
+    meal_week.save()
+    return JsonResponse({ "meal_week": model_to_dict(meal_week) })
+
+@login_required
+def get_meal_plans(req):
+    meal_weeks = MealWeek.objects.all()
+    meal_weeks = to_dict(meal_weeks)
+    return JsonResponse({"meal_weeks": meal_weeks})
+
+@login_required
+def get_meal(req):
+    #get recipe titles for a day
+    body = json.loads(req.body)
+    user = req.user
+    meal_week_id = body["meal_week"]
+    meal_day = body["meal_day"]
+    
+    meal_week = MealWeek.objects.get(id=meal_week_id, user=user)
+    day = MealDay.objects.getattr(meal_week, meal_day)
+    
+    return JsonResponse({"meal_day": day})
+
+@login_required
+def add_recipe(req):
+    #add recipe to meal day
+    body = json.loads(req.body)
+    meal_day_id = body["meal_day"]
+    day = MealDay.objects.get(id=meal_day_id)
+    meal = body["meal"]
+    
+    recipe = Recipe(
+        title=body["title"],
+        api_id=body["api_id"]
+    )
+    
+    day
+    
+    recipe.save()
+    return JsonResponse({"recipe": recipe})
+
+@login_required
+def search_recipies(req):
+    #got to api to get recipies
+    body = json.loads(req.body)
+    query = body["query"]
+    
+    api_key = os.environ.get("SPOONACULAR_API_KEY")
+    
+    url = f'https://api.spoonacular.com/recipes/complexSearch'
+    query_parms = f'?apiKey={api_key}&query={query}&number=10'
+    url.append(query_parms)
+    
+    response = requests.get(url)
+    print(response.text)
+    
+
+@login_required
+def random_recipe(req):
+    body = json.loads(req.body)
+    query = body["query"]
+    
+    api_key = os.environ.get("SPOONACULAR_API_KEY")
+    
+    url = f'https://api.spoonacular.com/recipes/random'
+    query_parms = f'?apiKey={api_key}&number=1'
+    url.append(query_parms)
+    
+    response = requests.get(url)
+
+def to_dicts(models):
+    return [model_to_dict(model) for model in models]
