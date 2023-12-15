@@ -8,6 +8,7 @@ from core.models import MealWeek, MealDay, Recipe
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import requests
+from datetime import datetime, timedelta
 
 # Load manifest when the server launches
 MANIFEST = {}
@@ -38,6 +39,7 @@ def create_meal_week(req):
         
     meal_week = MealWeek(
         user=req.user,
+        monday_date=body["mondayDate"],
         title=body["title"],
         monday=meals[0],
         tuesday=meals[1],
@@ -134,11 +136,17 @@ def random_recipe(req):
     else:
         return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
 
-
-def to_dicts(models):
-    return [model_to_dict(model) for model in models]
-
 @login_required
 def me(req):
     user = req.user
     return JsonResponse({"user": model_to_dict(user)})
+
+def to_dicts(models):
+    return [model_to_dict(model) for model in models]
+
+def get_most_recent_monday():
+    today = datetime.now()
+    day_of_week = today.weekday()  
+    difference = (day_of_week + 6) % 7 
+    most_recent_monday = today - timedelta(days=difference)
+    return most_recent_monday.date() 
