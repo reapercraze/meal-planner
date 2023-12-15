@@ -5,5 +5,6 @@ urlpatterns = [
     path('', view=views.index, name="index"),
     path('create_meal_week/', view=views.create_meal_week, name="create_meal_week"),
     path('random_recipe/', view=views.random_recipe, name="random_recipe"),
-    path('get_meal_plan/', view=views.get_meal_plan, name="get_meal_plan")
+    path('get_meal_plan/', view=views.get_meal_plan, name="get_meal_plan"),
+    path('user/', view=views.me, name="me")
 ]

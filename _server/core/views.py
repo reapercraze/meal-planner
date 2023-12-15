@@ -103,11 +103,18 @@ def search_recipies(req):
     api_key = os.environ.get("SPOONACULAR_API_KEY")
     
     url = f'https://api.spoonacular.com/recipes/complexSearch'
-    query_parms = f'?apiKey={api_key}&query={query}&number=10'
-    url.append(query_parms)
+    params = {
+        'apiKey': api_key,
+        'query': query,
+        'number': 10,
+    }
     
-    response = requests.get(url)
-    print(response.text)
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        recipe_data = response.json()
+        return JsonResponse({"recipe": recipe_data})
+    else:
+        return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
     
 def random_recipe(req):
 
@@ -130,3 +137,8 @@ def random_recipe(req):
 
 def to_dicts(models):
     return [model_to_dict(model) for model in models]
+
+@login_required
+def me(req):
+    user = req.user
+    return JsonResponse({"user": model_to_dict(user)})
