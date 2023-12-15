@@ -8,7 +8,10 @@ from core.models import MealWeek, MealDay, Recipe
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import requests
-from datetime import datetime, timedelta
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.utils.decorators import method_decorator
+
 
 # Load manifest when the server launches
 MANIFEST = {}
@@ -28,9 +31,10 @@ def index(req):
     }
     return render(req, "core/index.html", context)
 
-@login_required
-def create_meal_week(req):
-    body = json.loads(req.body)
+@method_decorator(login_required, name='dispatch')
+@api_view(['POST'])
+def create_meal_week(request):
+    body = request.data
     
     meals = []
     for _ in range(7):
@@ -50,12 +54,13 @@ def create_meal_week(req):
         monday_date=body["mondayDate"],
     )
     meal_week.save()
-    return JsonResponse({"meal_week": model_to_dict(meal_week)})
+    return Response({"meal_week": model_to_dict(meal_week)})
 
 
-@login_required
+@method_decorator(login_required, name='dispatch')
+@api_view(['POST'])
 def get_meal_plan(request):
-    body = json.loads(request.body)
+    body = request.data
     user = request.user
     current_week_str = body.get("currentWeek")
 
@@ -68,38 +73,38 @@ def get_meal_plan(request):
 
     meal_weeks = MealWeek.objects.filter(user=user, created_at__week=current_week.isocalendar()[1])
     meal_weeks = to_dicts(meal_weeks)
-    return JsonResponse({"meal_weeks": meal_weeks})
+    return Response({"meal_weeks": meal_weeks})
 
 
-@login_required
-def get_meal(req):
-    #get recipe titles for a day
-    body = json.loads(req.body)
-    user = req.user
+@method_decorator(login_required, name='dispatch')
+@api_view(['POST'])
+def get_meal(request):
+    body = request.data
+    user = request.user
     meal_week_id = body["meal_week"]
     meal_day = body["meal_day"]
     
     meal_week = MealWeek.objects.get(id=meal_week_id, user=user)
     day = MealDay.objects.getattr(meal_week, meal_day)
     
-    return JsonResponse({"meal_day": day})
+    return Response({"meal_day": model_to_dict(day)})
 
-@login_required
-def add_recipe(req):
-    #add recipe to meal day
-    body = json.loads(req.body)
+@method_decorator(login_required, name='dispatch')
+@api_view(['POST'])
+def add_recipe(request):
+    body = request.data
     
     recipe = Recipe(
         title=body["title"],
         api_id=body["api_id"]
     )
     recipe.save()
-    return JsonResponse({"recipe": recipe})
+    return JsonResponse({"recipe": model_to_dict(recipe)})
 
-@login_required
-def search_recipies(req):
+@method_decorator(login_required, name='dispatch')
+def search_recipies(request):
     #got to api to get recipies
-    body = json.loads(req.body)
+    body = request.data
     query = body["query"]
     
     api_key = os.environ.get("SPOONACULAR_API_KEY")
@@ -114,9 +119,9 @@ def search_recipies(req):
     response = requests.get(url, params=params)
     if response.status_code == 200:
         recipe_data = response.json()
-        return JsonResponse({"recipe": recipe_data})
+        return Response({"recipe": recipe_data})
     else:
-        return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
+        return Response({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
     
 def random_recipe(req):
 
@@ -132,21 +137,14 @@ def random_recipe(req):
 
     if response.status_code == 200:
         recipe_data = response.json()
-        return JsonResponse({"recipe": recipe_data})
+        return Response({"recipe": recipe_data})
     else:
-        return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
+        return Response({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
 
-@login_required
-def me(req):
-    user = req.user
-    return JsonResponse({"user": model_to_dict(user)})
+@method_decorator(login_required, name='dispatch')
+def me(request):
+    user = request.user
+    return Response({"user": model_to_dict(user)})
 
 def to_dicts(models):
     return [model_to_dict(model) for model in models]
-
-def get_most_recent_monday():
-    today = datetime.now()
-    day_of_week = today.weekday()  
-    difference = (day_of_week + 6) % 7 
-    most_recent_monday = today - timedelta(days=difference)
-    return most_recent_monday.date() 

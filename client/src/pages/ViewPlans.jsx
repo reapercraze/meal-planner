@@ -40,9 +40,7 @@ export function ViewPlans() {
       // User clicked Cancel
       return;
     }
-  
-    const csrfToken = document.cookie.split("; ").find(row => row.startsWith("csrftoken=")).split("=")[1];
-  
+
     try {
       const response = await fetch('/create_meal_week/', {
         credentials: "same-origin",
