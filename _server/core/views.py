@@ -1,21 +1,22 @@
+from datetime import datetime, timedelta
 from django.shortcuts import render
-from django.conf  import settings
+from django.conf import settings
 import json
 import os
 from django.contrib.auth.decorators import login_required
 from core.models import MealWeek, MealDay, Recipe
 from django.forms import model_to_dict
-from django.http import JsonResponse, request
+from django.http import JsonResponse
+import requests
 
-
-# Load manifest when server launches
+# Load manifest when the server launches
 MANIFEST = {}
 if not settings.DEBUG:
-    f = open(f"{settings.BASE_DIR}/core/static/manifest.json")
-    MANIFEST = json.load(f)
+    with open(f"{settings.BASE_DIR}/core/static/manifest.json") as f:  # Used 'with open' to handle file closure
+        MANIFEST = json.load(f)
 
 # Create your views here.
-@login_required
+        
 def index(req):
     context = {
         "asset_url": os.environ.get("ASSET_URL", ""),
@@ -30,10 +31,10 @@ def index(req):
 def create_meal_week(req):
     body = json.loads(req.body)
     
-    days = []
-    for day in range(0,7):
-        day = MealDay.create()
-        days.append(day)
+    meals = []
+    for _ in range(7):
+        meal_day = MealDay.objects.create()
+        meals.append(meal_day)
         
     meal_week = MealWeek(
         user=req.user,
@@ -47,13 +48,26 @@ def create_meal_week(req):
         sunday=meals[6],
     )
     meal_week.save()
-    return JsonResponse({ "meal_week": model_to_dict(meal_week) })
+    return JsonResponse({"meal_week": model_to_dict(meal_week)})
+
 
 @login_required
-def get_meal_plans(req):
-    meal_weeks = MealWeek.objects.all()
-    meal_weeks = to_dict(meal_weeks)
+def get_meal_plan(request):
+    body = json.loads(request.body)
+    user = request.user
+    current_week_str = body.get("currentWeek")
+
+    # If current_week is not provided, use the current date
+    if not current_week_str:
+        current_week = datetime.now().date()
+    else:
+        # Convert the string to a datetime.date object
+        current_week = datetime.strptime(current_week_str, "%Y-%m-%dT%H:%M:%S.%fZ").date()
+
+    meal_weeks = MealWeek.objects.filter(user=user, created_at__week=current_week.isocalendar()[1])
+    meal_weeks = to_dicts(meal_weeks)
     return JsonResponse({"meal_weeks": meal_weeks})
+
 
 @login_required
 def get_meal(req):
@@ -72,17 +86,11 @@ def get_meal(req):
 def add_recipe(req):
     #add recipe to meal day
     body = json.loads(req.body)
-    meal_day_id = body["meal_day"]
-    day = MealDay.objects.get(id=meal_day_id)
-    meal = body["meal"]
     
     recipe = Recipe(
         title=body["title"],
         api_id=body["api_id"]
     )
-    
-    day
-    
     recipe.save()
     return JsonResponse({"recipe": recipe})
 
@@ -101,19 +109,24 @@ def search_recipies(req):
     response = requests.get(url)
     print(response.text)
     
-
-@login_required
 def random_recipe(req):
-    body = json.loads(req.body)
-    query = body["query"]
-    
+
     api_key = os.environ.get("SPOONACULAR_API_KEY")
-    
-    url = f'https://api.spoonacular.com/recipes/random'
-    query_parms = f'?apiKey={api_key}&number=1'
-    url.append(query_parms)
-    
-    response = requests.get(url)
+
+    url = 'https://api.spoonacular.com/recipes/random'
+    params = {
+        'apiKey': api_key,
+        'number': 1,
+    }
+
+    response = requests.get(url, params=params)
+
+    if response.status_code == 200:
+        recipe_data = response.json()
+        return JsonResponse({"recipe": recipe_data})
+    else:
+        return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
+
 
 def to_dicts(models):
     return [model_to_dict(model) for model in models]

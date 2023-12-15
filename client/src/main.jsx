@@ -18,9 +18,9 @@ const router = createHashRouter([
         <div id="sign-in">
           <About />
         </div>
-        {/* <div id="app">
+        <div id="app">
           <App />
-        </div> */}
+        </div>
       </section>
     ),
   },
