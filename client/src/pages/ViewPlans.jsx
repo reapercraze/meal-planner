@@ -38,10 +38,9 @@ export function ViewPlans() {
   }
   
 
-  async function createNewWeek() {
-
+  async function createNewWeek(currentWeek) {
     const csrfToken = document.cookie.split("; ").find(row => row.startsWith("csrftoken=")).split("=")[1];
-
+  
     try {
       const response = await fetch('/create_meal_week/', {
         credentials: "same-origin",
@@ -52,9 +51,10 @@ export function ViewPlans() {
         },
         body: JSON.stringify({
           title: 'New Week',
+          currentWeek: currentWeek.toISOString(), // Pass the currentWeek as a parameter
         }),
       });
-
+  
       if (response.ok) {
         const data = await response.json();
         setMealWeeks([...mealWeeks, data.meal_week]);
@@ -65,6 +65,7 @@ export function ViewPlans() {
       console.error('Error creating a new week:', error);
     }
   }
+  
 
   async function logout() {
     const res = await fetch("/registration/logout/", {
@@ -131,7 +132,7 @@ export function ViewPlans() {
                 // Display meal plans if available
                 mealWeeks.map((mealWeek) => (
                   <div key={mealWeek.id} className={styles.mealPlan}>
-                    <h2>{mealWeek.title}</h2>
+                    <h2>{mealWeek.user}</h2>
                     {/* Add more details about the meal plan as needed */}
                   </div>
                 ))
