@@ -1,0 +1,61 @@
+:root {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.about {
+    background-color: wheat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50vw;
+    height: 100vh;
+}
+
+.title {
+    padding-bottom: 36px;
+    font-size: 3em;
+    color: green;
+    font-weight: bold;
+    font-family: cur;
+    margin-top: 16px;
+}
+
+.masterContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.textContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 400px;
+    padding: 40px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    background-color: lightcoral;
+    text-align: center;
+    max-height: fit-content;
+}
+
+.description {
+    margin-bottom: 20px;
+}
+
+.signinButton {
+    background-color: green;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+.signinButton:hover {
+    background-color: #45a049;
+}

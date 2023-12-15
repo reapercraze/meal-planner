@@ -1,0 +1,64 @@
+:root {
+background-color: wheat;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: lightcoral;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbarTitle {
+  font-size: 40px;
+  color: green;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.navbarButton {
+  background-color: green;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+.navbarButton:hover {
+  background-color: #45a049;
+}
+
+.container {
+  margin-left: 15px;
+}
+
+.date {
+  color: black;
+  margin-bottom: 40px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100vw;
+  margin-bottom: 45vh;
+}
+
+.meal {
+  font-size: 49px;
+}
+
+
+
+  
