@@ -50,7 +50,10 @@ export function ViewPlans() {
         },
         body: JSON.stringify({
           title: weekTitle,
-        }),
+    })
+  })
+    
+      
 
   
       if (!responseJson.error) {
