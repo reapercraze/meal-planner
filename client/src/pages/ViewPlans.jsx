@@ -1,5 +1,5 @@
 import React from "react";
-import '../styles/ViewPlans.css';
+import styles from '../styles/ViewPlans.module.css';
 
 export function ViewPlans() {
     return (

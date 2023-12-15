@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
-import './index.css';
+import './index.module.css';
 import 'vite/modulepreload-polyfill';
 
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Home } from './pages/Home.jsx';
 import { CreatePlan } from './pages/CreatePlan.jsx';
 import { About } from './pages/About.jsx';
-import { SignUp } from './pages/SignUp.jsx';
 import { ViewPlans } from './pages/ViewPlans.jsx';
 
 const router = createHashRouter([
@@ -19,9 +18,9 @@ const router = createHashRouter([
         <div id="sign-in">
           <About />
         </div>
-        <div id="app">
+        {/* <div id="app">
           <App />
-        </div>
+        </div> */}
       </section>
     ),
   },
@@ -32,10 +31,6 @@ const router = createHashRouter([
   {
     path: '/create_plan',
     element: <CreatePlan />,
-  },
-  {
-    path: '/sign_up',
-    element: <SignUp />,
   },
   {
     path: '/view_plans',

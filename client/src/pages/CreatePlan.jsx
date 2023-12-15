@@ -1,5 +1,5 @@
 import React from "react";
-import '../styles/CreatePlan.css';
+import styles from '../styles/CreatePlan.module.css';
 
 export function CreatePlan() {
     return (
