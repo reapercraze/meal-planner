@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from django.shortcuts import render
 from django.conf import settings
 import json
@@ -30,9 +31,9 @@ def index(req):
 def create_meal_week(req):
     body = json.loads(req.body)
     
-    meals = []  # Added list to store MealDay objects
-    for _ in range(7):  # Changed 'day' to '_' to indicate it's not being used
-        meal_day = MealDay.create()
+    meals = []
+    for _ in range(7):
+        meal_day = MealDay.objects.create()
         meals.append(meal_day)
         
     meal_week = MealWeek(
@@ -49,11 +50,24 @@ def create_meal_week(req):
     meal_week.save()
     return JsonResponse({"meal_week": model_to_dict(meal_week)})
 
+
 @login_required
-def get_meal_plan(req):
-    meal_weeks = MealWeek.objects.all()
+def get_meal_plan(request):
+    body = json.loads(request.body)
+    user = request.user
+    current_week_str = body.get("currentWeek")
+
+    # If current_week is not provided, use the current date
+    if not current_week_str:
+        current_week = datetime.now().date()
+    else:
+        # Convert the string to a datetime.date object
+        current_week = datetime.strptime(current_week_str, "%Y-%m-%dT%H:%M:%S.%fZ").date()
+
+    meal_weeks = MealWeek.objects.filter(user=user, created_at__week=current_week.isocalendar()[1])
     meal_weeks = to_dicts(meal_weeks)
     return JsonResponse({"meal_weeks": meal_weeks})
+
 
 @login_required
 def get_meal(req):

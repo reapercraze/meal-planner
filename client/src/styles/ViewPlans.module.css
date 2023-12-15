@@ -36,10 +36,6 @@ background-color: wheat;
     background-color: #45a049;
 }
 
-.container {
-    margin-left: 15px;
-}
-
 .date {
     color: black;
     margin-bottom: 40px;
@@ -49,10 +45,9 @@ background-color: wheat;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
     width: 100vw;
-    margin-bottom: 45vh;
+    margin-top: 200px;
 }
 
 .meal {
@@ -74,6 +69,21 @@ background-color: wheat;
     color: black;
 }
 
+.createPlanButton {
+    background-color: green;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 30px;
+    font-size: 30px;
+}
+
+.errorMessage {
+    font-size: 30px;
+    color: black;
+}
 
 
     
