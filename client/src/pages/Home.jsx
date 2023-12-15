@@ -31,7 +31,7 @@ export function Home() {
     <>
       <nav className={styles.navbar}>
         <div className={styles.navbarLeft}>
-          <span className={styles.navbarTitle}>Meal Deal</span>
+          <span className={styles.navbarTitle}>Meal Deal - Home</span>
         </div>
         <div className={styles.navbarRight}>
             <Link to="/view_plans">
