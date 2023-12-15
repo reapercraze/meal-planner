@@ -37,26 +37,14 @@ export function ViewPlans() {
       // User clicked Cancel
       return;
     }
-  
-    const csrfToken = document.cookie.split("; ").find(row => row.startsWith("csrftoken=")).split("=")[1];
-  
-    try {
-      const response = await fetch('/create_meal_week/', {
-        credentials: "same-origin",
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify({
-          title: weekTitle,
-    })
-  })
-    
-      
 
+    try {
+      const responseJson = await makeRequest('/create_meal_week/', method='post', 
+      body = {
+        "title": weekTitle
+      });
   
-      if (!responseJson.error) {
+      if (!response.error) {
         setMealWeeks([...mealWeeks, responseJson.meal_week]);
       } else {
         console.error(`Failed request. Status code: ${responseJson.status}`);
