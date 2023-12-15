@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom'
 import styles from '../styles/CreatePlan.module.css';
 
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../utils/make_request";
 
@@ -53,6 +52,7 @@ export function CreatePlan() {
     // TODO make sure request succeeded
 
     navigate(-1);
+  }
 
   return (
     <>
@@ -87,5 +87,5 @@ export function CreatePlan() {
           </div>
         </section>
     </>
-  )}
+  )
 }
