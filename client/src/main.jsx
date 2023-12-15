@@ -9,7 +9,6 @@ import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { Home } from './pages/Home.jsx';
 import { About } from './pages/About.jsx';
 import { ViewPlans } from './pages/ViewPlans.jsx';
-import AuthGuard from './AuthGuard.jsx'; // Import AuthGuard
 
 const router = createHashRouter([
   {
@@ -28,17 +27,13 @@ const router = createHashRouter([
   {
     path: '/home',
     element: (
-      <AuthGuard>
         <Home />
-      </AuthGuard>
     ),
   },
   {
     path: '/view_plans',
     element: (
-      <AuthGuard>
         <ViewPlans />
-      </AuthGuard>
     ),
   },
 ]);

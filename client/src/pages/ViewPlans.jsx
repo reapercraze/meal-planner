@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import styles from '../styles/ViewPlans.module.css';
-import { makeRequest } from './utils/make_request';
+import { makeRequest } from '../utils/make_request';
 
 export function ViewPlans() {
   const [currentWeek, setCurrentWeek] = useState(getMostRecentMonday());
@@ -13,10 +13,11 @@ export function ViewPlans() {
 
   async function fetchMealPlans() {
     try {
-      const responseJson = await makeRequest('/get_meal_plan/', method='post', 
-      body = {
+      const responseJson = await makeRequest('/get_meal_plan/', 'POST', {
         currentWeek: currentWeek.toISOString()
       });
+  
+      console.log('Response:', responseJson);
   
       if (!responseJson.error) {
         setMealWeeks(responseJson.meal_weeks);
@@ -26,7 +27,9 @@ export function ViewPlans() {
     } catch (error) {
       console.error('Error fetching meal weeks:', error);
     }
-  };
+  }
+  
+  
   
 
   async function createNewWeek() {
@@ -54,12 +57,10 @@ export function ViewPlans() {
   })
     
       
-
-  
-      if (!responseJson.error) {
-        setMealWeeks([...mealWeeks, responseJson.meal_week]);
+      if (!response.error) {
+        setMealWeeks([...mealWeeks, response.meal_week]);
       } else {
-        console.error(`Failed request. Status code: ${responseJson.status}`);
+        console.error(`Failed request. Status code: ${response.status}`);
       }
     } catch (error) {
       console.error('Error Failed to create a new week:', error);
@@ -101,6 +102,20 @@ export function ViewPlans() {
     setCurrentWeek(nextWeek);
   };
 
+  async function getRecipe() {
+    try {
+      const responseJson = await makeRequest('/random_recipe/');
+  
+      if (!responseJson.error) {
+        setRandomRecipe(responseJson.recipe.recipes[0]);
+      } else {
+        console.error(`Failed request. Status code: ${responseJson.status}`);
+      }
+    } catch (error) {
+      console.error('Error fetching random recipe:', error);
+    }
+  };
+
   return (
     <>
       <nav className={styles.navbar}>
@@ -129,11 +144,21 @@ export function ViewPlans() {
             </div>
             <div className={styles.mealDisplay}>
               {mealWeeks.length > 0 ? (
-                // Display meal plans if available
                 mealWeeks.map((mealWeek) => (
-                  <div key={mealWeek.id} className={styles.mealPlan}>
+                  <div key={mealWeek.id} className={styles.mealPlan} onClick={() => handleMealPlanClick(mealWeek)}>
                     <h2>{mealWeek.title}</h2>
-                    {/* Add more details about the meal plan as needed */}
+                    <div className={styles.daysContainer}>
+                      {mealWeek.days.map((day, index) => (
+                        <div key={index} className={styles.dayBox} onClick={(e) => handleDayBoxClick(e, mealWeek, day)}>
+                          <h3>{getDayOfWeek(index)}</h3>
+                          <div className={styles.mealsContainer}>
+                            <p>Breakfast: {day.breakfast}</p>
+                            <p>Lunch: {day.lunch}</p>
+                            <p>Dinner: {day.dinner}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))
               ) : (

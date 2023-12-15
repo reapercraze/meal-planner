@@ -85,5 +85,43 @@ background-color: wheat;
     color: black;
 }
 
+/* Add these styles to your existing CSS file */
 
-    
+.mealPlan {
+    margin: 20px;
+    padding: 20px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  .mealPlan:hover {
+    border-color: #45a049;
+  }
+  
+  .daysContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .dayBox {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  .dayBox:hover {
+    border-color: #45a049;
+  }
+  
+  .mealsContainer {
+    margin-top: 10px;
+  }
+  
+  /* You can customize the styles further based on your design preferences */
+  

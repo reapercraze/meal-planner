@@ -39,7 +39,6 @@ def create_meal_week(req):
         
     meal_week = MealWeek(
         user=req.user,
-        monday_date=body["mondayDate"],
         title=body["title"],
         monday=meals[0],
         tuesday=meals[1],
@@ -48,6 +47,7 @@ def create_meal_week(req):
         friday=meals[4],
         saturday=meals[5],
         sunday=meals[6],
+        monday_date=body["mondayDate"],
     )
     meal_week.save()
     return JsonResponse({"meal_week": model_to_dict(meal_week)})

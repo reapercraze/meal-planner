@@ -1,6 +1,6 @@
 import cookie from "cookie";
 
-export async function makeRequest(uri, method = "get", body = {}) {
+export async function makeRequest(uri, method = "GET", body = {}) {
   const parsedCookie = cookie.parse(document.cookie)
   const options = {
     method,
@@ -12,7 +12,7 @@ export async function makeRequest(uri, method = "get", body = {}) {
     credentials: "same-origin", // includes cookies in the request
   }
 
-  if (method === "post") {
+  if (method === "POST") {
     options.body = JSON.stringify(body)
   }
 
