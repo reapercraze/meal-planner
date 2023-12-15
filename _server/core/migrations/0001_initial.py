@@ -41,6 +41,7 @@ class Migration(migrations.Migration):
                 ('tuesday', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='tuesday_meals', to='core.mealday')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('wednesday', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='wednesday_meals', to='core.mealday')),
+                ('title', models.CharField(null=True, max_length=255))
             ],
         ),
         migrations.AddField(
