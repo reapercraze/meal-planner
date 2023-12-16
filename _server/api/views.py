@@ -1,3 +1,6 @@
+from django.shortcuts import render
+
+# Create your views here.
 from datetime import datetime, timedelta
 from django.shortcuts import render
 from django.conf import settings
@@ -8,6 +11,11 @@ from core.models import MealWeek, MealDay, Recipe
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import requests
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.utils.decorators import method_decorator
+from rest_framework.authtoken.models import Token
 
 
 # Load manifest when the server launches
@@ -28,7 +36,8 @@ def index(req):
     }
     return render(req, "core/index.html", context)
 
-@login_required
+@method_decorator(login_required, name='dispatch')
+@api_view(['POST'])
 def create_meal_week(request):
     body = request.data
     
@@ -50,9 +59,11 @@ def create_meal_week(request):
         monday_date=body["mondayDate"],
     )
     meal_week.save()
-    return JsonResponse({"meal_week": model_to_dict(meal_week)})
+    return Response({"meal_week": model_to_dict(meal_week)})
 
-@login_required
+
+@method_decorator(login_required, name='dispatch')
+@api_view(['POST'])
 def get_meal_plan(request):
     body = request.data
     user = request.user
@@ -67,9 +78,11 @@ def get_meal_plan(request):
 
     meal_weeks = MealWeek.objects.filter(user=user, created_at__week=current_week.isocalendar()[1])
     meal_weeks = to_dicts(meal_weeks)
-    return JsonResponse({"meal_weeks": meal_weeks})
+    return Response({"meal_weeks": meal_weeks})
 
-@login_required
+
+@method_decorator(login_required, name='dispatch')
+@api_view(['POST'])
 def get_meal(request):
     body = request.data
     user = request.user
@@ -79,9 +92,10 @@ def get_meal(request):
     meal_week = MealWeek.objects.get(id=meal_week_id, user=user)
     day = MealDay.objects.getattr(meal_week, meal_day)
     
-    return JsonResponse({"meal_day": model_to_dict(day)})
+    return Response({"meal_day": model_to_dict(day)})
 
-@login_required
+@method_decorator(login_required, name='dispatch')
+@api_view(['POST'])
 def add_recipe(request):
     body = request.data
     
@@ -90,14 +104,16 @@ def add_recipe(request):
         api_id=body["api_id"]
     )
     recipe.save()
-    return JsonResponse({"recipe": model_to_dict(recipe)})
+    return Response({"recipe": model_to_dict(recipe)})
 
+@api_view(['GET'])
 @login_required
 def me(request):
     user = request.user
-    return JsonResponse({"user": model_to_dict(user)})
+    return Response({"user": model_to_dict(user)})
 
-@login_required
+@api_view(['GET'])
+@method_decorator(login_required, name='dispatch')
 def search_recipies(request):
     #got to api to get recipies
     body = request.data
@@ -115,10 +131,11 @@ def search_recipies(request):
     response = requests.get(url, params=params)
     if response.status_code == 200:
         recipe_data = response.json()
-        return JsonResponse({"recipe": recipe_data})
+        return Response({"recipe": recipe_data})
     else:
-        return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
+        return Response({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
   
+@api_view(['GET'])  
 def random_recipe(req):
 
     api_key = os.environ.get("SPOONACULAR_API_KEY")
@@ -133,9 +150,35 @@ def random_recipe(req):
 
     if response.status_code == 200:
         recipe_data = response.json()
-        return JsonResponse({"recipe": recipe_data})
+        return Response({"recipe": recipe_data})
     else:
-        return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
+        return Response({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
+
+
+@api_view(['POST'])
+def register(request):
+    try:
+        data = request.data
+        user = User.objects.create(
+            username=data['username'],
+            email=data['email'],
+            password=make_password(data['password'])
+        )
+        user.save()
+        return Response({'message': 'User created successfully.'}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+@api_view(['POST'])
+def login(request):
+    user = authenticate(username=request.data['username'], password=request.data['password'])
+    if user is not None:
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})
+    else:
+        return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 def to_dicts(models):
     return [model_to_dict(model) for model in models]
