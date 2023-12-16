@@ -6,5 +6,7 @@ urlpatterns = [
     path('create_meal_week/', view=views.create_meal_week, name="create_meal_week"),
     path('random_recipe/', view=views.random_recipe, name="random_recipe"),
     path('get_meal_plan/', view=views.get_meal_plan, name="get_meal_plan"),
-    path('user/', view=views.me, name="me")
+    path('me/', view=views.me, name="me"),
+    path('register/', view=views.register, name="register"),
+    path('login/', view=views.login, name="login")
 ]

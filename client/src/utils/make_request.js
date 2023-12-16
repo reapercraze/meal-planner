@@ -17,9 +17,9 @@ export async function makeRequest(uri, method = "GET", body = {}) {
       credentials: "same-origin", // includes cookies in the request
     };
 
-    if (method === "POST") {
-      options.body = JSON.stringify(body);
-    }
+  if (method.toUpperCase() === "POST") {
+    options.body = JSON.stringify(body)
+  }
 
     let json;
     const response = await fetch(uri, options);
