@@ -10,7 +10,9 @@ from django.http import JsonResponse
 import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from django.utils.decorators import method_decorator
+from rest_framework.authtoken.models import Token
 
 
 # Load manifest when the server launches
@@ -145,6 +147,31 @@ def random_recipe(req):
 def me(request):
     user = request.user
     return Response({"user": model_to_dict(user)})
+
+@api_view(['POST'])
+def register(request):
+    try:
+        data = request.data
+        user = User.objects.create(
+            username=data['username'],
+            email=data['email'],
+            password=make_password(data['password'])
+        )
+        user.save()
+        return Response({'message': 'User created successfully.'}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+@api_view(['POST'])
+def login(request):
+    user = authenticate(username=request.data['username'], password=request.data['password'])
+    if user is not None:
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})
+    else:
+        return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 def to_dicts(models):
     return [model_to_dict(model) for model in models]
