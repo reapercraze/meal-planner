@@ -55,9 +55,6 @@ export function Home() {
             <Link to="/view_plans">
                 <button className={styles.navbarButton}>View Plans</button>
             </Link>
-            <Link to="/create_plan">
-                <button className={styles.navbarButton}>Create Plans</button>
-            </Link>
           <button className={styles.navbarButton} onClick={logout}>Logout</button>
         </div>
       </nav>

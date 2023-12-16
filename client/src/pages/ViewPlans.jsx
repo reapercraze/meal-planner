@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import styles from '../styles/ViewPlans.module.css';
 import { makeRequest } from '../utils/make_request';
+import cookie from "cookie";
 
 export function ViewPlans() {
   const [currentWeek, setCurrentWeek] = useState(getMostRecentMonday());
@@ -33,6 +34,10 @@ export function ViewPlans() {
   
 
   async function createNewWeek() {
+    // Get CSRF token from cookies
+    const parsedCookie = cookie.parse(document.cookie);
+    const csrfToken = parsedCookie.csrftoken;
+  
     // Prompt the user for the week title
     const weekTitle = window.prompt('Enter the name of the week:', 'New Week');
   
@@ -40,7 +45,7 @@ export function ViewPlans() {
       // User clicked Cancel
       return;
     }
-
+  
     try {
       const response = await fetch('/create_meal_week/', {
         credentials: "same-origin",
@@ -51,10 +56,11 @@ export function ViewPlans() {
         },
         body: JSON.stringify({
           title: weekTitle,
-    })
-  })
-    
-      
+          mondayDate: getMostRecentMonday()
+          
+        }),
+      });
+  
       if (!response.error) {
         setMealWeeks([...mealWeeks, response.meal_week]);
       } else {
@@ -123,9 +129,6 @@ export function ViewPlans() {
         <div className={styles.navbarRight}>
             <Link to="/home">
                 <button className={styles.navbarButton}>Home</button>
-            </Link>
-            <Link to="/create_plan">
-                <button className={styles.navbarButton}>Create Plans</button>
             </Link>
           <button className={styles.navbarButton} onClick={logout}>Logout</button>
         </div>

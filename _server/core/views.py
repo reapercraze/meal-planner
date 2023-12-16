@@ -11,6 +11,7 @@ import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User
 
 
 # Load manifest when the server launches
@@ -31,19 +32,22 @@ def index(req):
     }
     return render(req, "core/index.html", context)
 
-@method_decorator(login_required, name='dispatch')
-@api_view(['POST'])
+@login_required
 def create_meal_week(request):
-    body = request.data
+    body = request.body
     
     meals = []
     for _ in range(7):
         meal_day = MealDay.objects.create()
         meals.append(meal_day)
-        
+
+    print(request.user)
+
+    # user = User.objects.get(id=body.user.id)
+
     meal_week = MealWeek(
-        user=req.user,
-        title=body["title"],
+        # user=user,
+        title=body[0],
         monday=meals[0],
         tuesday=meals[1],
         wednesday=meals[2],
@@ -51,16 +55,14 @@ def create_meal_week(request):
         friday=meals[4],
         saturday=meals[5],
         sunday=meals[6],
-        monday_date=body["mondayDate"],
+        monday_date=body[1],
     )
     meal_week.save()
     return Response({"meal_week": model_to_dict(meal_week)})
 
-
-@method_decorator(login_required, name='dispatch')
-@api_view(['POST'])
+@login_required
 def get_meal_plan(request):
-    body = request.data
+    body = request.body
     user = request.user
     current_week_str = body.get("currentWeek")
 
@@ -76,10 +78,9 @@ def get_meal_plan(request):
     return Response({"meal_weeks": meal_weeks})
 
 
-@method_decorator(login_required, name='dispatch')
-@api_view(['POST'])
+@login_required
 def get_meal(request):
-    body = request.data
+    body = request.body
     user = request.user
     meal_week_id = body["meal_week"]
     meal_day = body["meal_day"]
@@ -89,8 +90,7 @@ def get_meal(request):
     
     return Response({"meal_day": model_to_dict(day)})
 
-@method_decorator(login_required, name='dispatch')
-@api_view(['POST'])
+@login_required
 def add_recipe(request):
     body = request.data
     
@@ -101,7 +101,7 @@ def add_recipe(request):
     recipe.save()
     return JsonResponse({"recipe": model_to_dict(recipe)})
 
-@method_decorator(login_required, name='dispatch')
+@login_required
 def search_recipies(request):
     #got to api to get recipies
     body = request.data
@@ -123,6 +123,7 @@ def search_recipies(request):
     else:
         return Response({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
     
+
 def random_recipe(req):
 
     api_key = os.environ.get("SPOONACULAR_API_KEY")
@@ -141,7 +142,7 @@ def random_recipe(req):
     else:
         return Response({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
 
-@method_decorator(login_required, name='dispatch')
+@login_required
 def me(request):
     user = request.user
     return Response({"user": model_to_dict(user)})
