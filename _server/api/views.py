@@ -58,7 +58,7 @@ def sign_in(request):
     return Response({"error": "Invalid request"}, status=400)
 
 @api_view(['POST'])
-def logout_view(request):
+def logout(request):
     logout(request)
     return Response({"success": True})
 
