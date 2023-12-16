@@ -18,8 +18,6 @@ export function ViewPlans() {
         currentWeek: currentWeek.toISOString()
       });
   
-      console.log('Response:', responseJson);
-  
       if (!responseJson.error) {
         setMealWeeks(responseJson.meal_weeks);
       } else {
@@ -44,14 +42,7 @@ export function ViewPlans() {
     }
   
     try {
-      const response = await fetch('/create_meal_week/', {
-        credentials: "same-origin",
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify({
+      const responseJson = makeRequest('/create_meal_week/', 'POST', {
           title: weekTitle,
           mondayDate: getMostRecentMonday()
         }),
@@ -60,7 +51,7 @@ export function ViewPlans() {
       if (!response.error) {
         setMealWeeks([...mealWeeks, response.meal_week]);
       } else {
-        console.error(`Failed request. Status code: ${response.status}`);
+        console.error(`Failed request. Status code: ${responseJson.status}`);
       }
     } catch (error) {
       console.error('Error Failed to create a new week:', error);
@@ -130,6 +121,8 @@ export function ViewPlans() {
               {`${currentWeek.toLocaleDateString()} - ${new Date(currentWeek.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString()}`}
               <button onClick={goToNextWeek} className={styles.weekButton}>&gt;</button>
             </div>
+
+
             <div className={styles.mealDisplay}>
             {mealWeeks.length > 0 ? (
               mealWeeks.map((mealWeek) => (
