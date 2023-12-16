@@ -7,6 +7,10 @@ import cookie from "cookie";
 export function ViewPlans() {
   const [currentWeek, setCurrentWeek] = useState(getMostRecentMonday());
   const [mealWeeks, setMealWeeks] = useState([]);
+  const [selectedDayBox, setSelectedDayBox] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [mealDay, setMealDay] = useState(null)
+
 
   useEffect(() => {
     fetchMealPlans();
@@ -71,6 +75,49 @@ export function ViewPlans() {
     }
   }
 
+  async function getMeal(meal_week_id, meal_day) {
+    try {
+      const responseJson = await makeRequest('/get_meal/', 'POST', {
+        meal_week: meal_week_id,
+        meal_day: meal_day,
+      });
+  
+      if (!responseJson.error) {
+        setMealDay(responseJson);
+      } else {
+        console.error(`Failed request. Status code: ${responseJson.status}`);
+      }
+    } catch (error) {
+      console.error('Error fetching meal:', error);
+    }
+  }
+
+  async function onFindRecipe(meal_of_day) {
+    const food = window.prompt('Enter the name of a meal; be as generic or specific as you want:', 'Pasta');
+  
+    if (food === null) {
+      // User clicked Cancel
+      return;
+    }
+
+    try {
+      const responseJson = await makeRequest('/find_recipe/', 'POST', {
+        query: food,
+        meal: meal_of_day,
+        id: mealDay.meal_day["id"]
+      });
+
+      if (!responseJson.error) {
+        console.log(responseJson)
+      } else {
+        console.error(`Failed request. Status code: ${responseJson.status}`);
+      } 
+    } catch {
+      console.error('Error fetching recipe', error);
+    }
+  }
+    
+
   function getMostRecentMonday() {
     const today = new Date();
     const dayOfWeek = today.getDay();
@@ -92,11 +139,56 @@ export function ViewPlans() {
     setCurrentWeek(nextWeek);
   };
 
-  function getDayOfWeek(day) {
-    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    return daysOfWeek[day];
-  }
+  const handleDayBoxClick = (e, mealWeek, dayOfWeek) => {
+    setSelectedDayBox({ mealWeek, dayOfWeek });
+    setIsModalOpen(true);
+    setMealDay(getMeal(mealWeek.id, `${mealWeek[dayOfWeek.toLowerCase()]}`))
+  };
+
+  const MealDayModal = ({ selectedDayBox, onClose }) => {
+    if (!selectedDayBox) return null;
   
+    const { mealWeek, dayOfWeek } = selectedDayBox;
+    const dayContent = `${mealWeek[dayOfWeek.toLowerCase()]}`;
+  
+    return (
+      <div className={styles.modalOverlay}>
+        <div className={styles.modal}>
+          <h3 className={styles.modalTitle}>{dayOfWeek}</h3>
+          <p className={styles.modalMeal}>
+            Breakfast: {mealDay.breakfast_recipe}
+            {mealDay.breakfast_recipe === undefined && (
+              <button className={styles.modalFindRecipe} onClick={() => onFindRecipe('breakfast_recipe')}>
+                Find Recipe
+              </button>
+            )}
+          </p>
+          <p className={styles.modalMeal}>
+            Lunch: {mealDay.lunch_recipe}
+            {mealDay.lunch_recipe === undefined && (
+              <button className={styles.modalFindRecipe} onClick={() => onFindRecipe('lunch_recipe')}>
+                Find Recipe
+              </button>
+            )}
+          </p>
+          <p className={styles.modalMeal}>
+            Dinner: {mealDay.dinner_recipe}
+            {mealDay.dinner_recipe === undefined && (
+              <button className={styles.modalFindRecipe} onClick={() => onFindRecipe('dinner_recipe')}>
+                Find Recipe
+              </button>
+            )}
+          </p>
+          <button className={styles.modalButton} onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
+  
+
 
   return (
     <>
@@ -121,12 +213,10 @@ export function ViewPlans() {
               {`${currentWeek.toLocaleDateString()} - ${new Date(currentWeek.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString()}`}
               <button onClick={goToNextWeek} className={styles.weekButton}>&gt;</button>
             </div>
-
-
             <div className={styles.mealDisplay}>
             {mealWeeks.length > 0 ? (
               mealWeeks.map((mealWeek) => (
-                <div key={mealWeek.id} className={styles.mealPlan} onClick={() => handleMealPlanClick(mealWeek)}>
+                <div key={mealWeek.id} className={styles.mealPlan}>
                   <h2>{mealWeek.title}</h2>
                   <div className={styles.daysContainer}>
                     {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((dayOfWeek) => {
@@ -156,6 +246,11 @@ export function ViewPlans() {
           </div>
         </div>
       </section>
-    </>
+      {isModalOpen && (
+        <section className={styles.modalPlease}>
+          <MealDayModal selectedDayBox={selectedDayBox} onClose={() => setIsModalOpen(false)} />
+        </section>
+      )}
+    </>  
   );
 }

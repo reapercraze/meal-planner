@@ -77,13 +77,15 @@ def get_meal_plan(request):
 def get_meal(request):
     body = json.loads(request.body)
     user = request.user
-    meal_week_id = body["meal_week"]
     meal_day = body["meal_day"]
-    
-    meal_week = MealWeek.objects.get(id=meal_week_id, user=user)
-    day = MealDay.objects.getattr(meal_week, meal_day)
-    
-    return JsonResponse({"meal_day": model_to_dict(day)})
+
+    try:
+        day = MealDay.objects.get(id=meal_day)
+        return JsonResponse({"meal_day": model_to_dict(day)})
+    except MealWeek.DoesNotExist:
+        return JsonResponse({"error": "MealWeek not found"}, status=404)
+    except MealDay.DoesNotExist:
+        return JsonResponse({"error": "MealDay not found"}, status=404)
 
 @login_required
 def add_recipe(request):
@@ -106,6 +108,9 @@ def search_recipies(request):
     #got to api to get recipies
     body = json.loads(request.body)
     query = body["query"]
+    mealDayId = body["id"]
+    meal = body["meal"]
+
     
     api_key = os.environ.get("SPOONACULAR_API_KEY")
     
@@ -113,12 +118,31 @@ def search_recipies(request):
     params = {
         'apiKey': api_key,
         'query': query,
-        'number': 10,
+        'number': 1,
     }
     
     response = requests.get(url, params=params)
     if response.status_code == 200:
         recipe_data = response.json()
+        title = recipe_data["results"][0]['title']
+        id = recipe_data["results"][0]['id']
+
+        if Recipe.objects.get(api_id=id) == None:
+
+            recipe = Recipe.objects.create(title=title, api_id=id)
+            recipe.save()
+
+        mealDay = MealDay.objects.get(id=mealDayId)
+
+        if meal == "breakfast_recipe":
+            mealDay.breakfast_recipe = Recipe.objects.get(title=title)
+        if meal == "lunch_recipe":
+            mealDay.lunch_recipe = Recipe.objects.get(title=title)
+        if meal == "dinner_recipe":
+            mealDay.dinner_recipe = Recipe.objects.get(title=title)
+        
+        mealDay.save()
+
         return JsonResponse({"recipe": recipe_data})
     else:
         return JsonResponse({"error": f"Failed to fetch random recipe. Status code: {response.status_code}"}, status=response.status_code)
