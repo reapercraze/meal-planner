@@ -42,20 +42,20 @@ export function ViewPlans() {
     }
   
     try {
-      const responseJson = makeRequest('/create_meal_week/', 'POST', {
-          title: weekTitle,
-          mondayDate: getMostRecentMonday()
-        }),
+      const responseJson = await makeRequest('/create_meal_week/', 'POST', {
+        title: weekTitle,
+        mondayDate: getMostRecentMonday(),
       });
-  
-      if (!response.error) {
-        setMealWeeks([...mealWeeks, response.meal_week]);
+    
+      if (!responseJson.error) {
+        setMealWeeks([...mealWeeks, responseJson.meal_week]);
       } else {
         console.error(`Failed request. Status code: ${responseJson.status}`);
       }
     } catch (error) {
       console.error('Error Failed to create a new week:', error);
     }
+    
   }
   
   async function logout() {
