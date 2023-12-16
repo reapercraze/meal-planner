@@ -17,8 +17,6 @@ export function ViewPlans() {
         currentWeek: currentWeek.toISOString()
       });
   
-      console.log('Response:', responseJson);
-  
       if (!responseJson.error) {
         setMealWeeks(responseJson.meal_weeks);
       } else {
@@ -42,23 +40,14 @@ export function ViewPlans() {
     }
 
     try {
-      const response = await fetch('/create_meal_week/', {
-        credentials: "same-origin",
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify({
+      const responseJson = makeRequest('/create_meal_week/', 'POST', {
           title: weekTitle,
-    })
-  })
-    
+        })
       
-      if (!response.error) {
-        setMealWeeks([...mealWeeks, response.meal_week]);
+      if (!responseJson.error) {
+        setMealWeeks([...mealWeeks, responseJson.meal_week]);
       } else {
-        console.error(`Failed request. Status code: ${response.status}`);
+        console.error(`Failed request. Status code: ${responseJson.status}`);
       }
     } catch (error) {
       console.error('Error Failed to create a new week:', error);
@@ -100,18 +89,17 @@ export function ViewPlans() {
     setCurrentWeek(nextWeek);
   };
 
-  async function getRecipe() {
-    try {
-      const responseJson = await makeRequest('/random_recipe/');
-  
-      if (!responseJson.error) {
-        setRandomRecipe(responseJson.recipe.recipes[0]);
-      } else {
-        console.error(`Failed request. Status code: ${responseJson.status}`);
-      }
-    } catch (error) {
-      console.error('Error fetching random recipe:', error);
-    }
+  const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+
+  const handleDayBoxClick = (e, mealWeek, day) => {
+    // Handle click on a day box
+    // ...
+  };
+
+  const handleMealPlanClick = (mealWeek) => {
+    // Handle click on a meal plan
+    // ...
   };
 
   return (
@@ -123,9 +111,6 @@ export function ViewPlans() {
         <div className={styles.navbarRight}>
             <Link to="/home">
                 <button className={styles.navbarButton}>Home</button>
-            </Link>
-            <Link to="/create_plan">
-                <button className={styles.navbarButton}>Create Plans</button>
             </Link>
           <button className={styles.navbarButton} onClick={logout}>Logout</button>
         </div>
@@ -140,15 +125,18 @@ export function ViewPlans() {
               {`${currentWeek.toLocaleDateString()} - ${new Date(currentWeek.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString()}`}
               <button onClick={goToNextWeek} className={styles.weekButton}>&gt;</button>
             </div>
+
+
             <div className={styles.mealDisplay}>
               {mealWeeks.length > 0 ? (
                 mealWeeks.map((mealWeek) => (
                   <div key={mealWeek.id} className={styles.mealPlan} onClick={() => handleMealPlanClick(mealWeek)}>
+                    
                     <h2>{mealWeek.title}</h2>
                     <div className={styles.daysContainer}>
-                      {mealWeek.days.map((day, index) => (
-                        <div key={index} className={styles.dayBox} onClick={(e) => handleDayBoxClick(e, mealWeek, day)}>
-                          <h3>{getDayOfWeek(index)}</h3>
+                      {daysOfWeek.map((day) => (
+                        <div key={day} className={styles.dayBox} onClick={(e) => handleDayBoxClick(e, mealWeek, day)}>
+                          <h3>{day.charAt(0).toUpperCase() + day.slice(1)}</h3>
                           <div className={styles.mealsContainer}>
                             <p>Breakfast: {day.breakfast}</p>
                             <p>Lunch: {day.lunch}</p>
