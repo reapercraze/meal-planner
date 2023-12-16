@@ -12,7 +12,7 @@ export async function makeRequest(uri, method = "GET", body = {}) {
     credentials: "same-origin", // includes cookies in the request
   }
 
-  if (method === "POST") {
+  if (method.toUpperCase() === "POST") {
     options.body = JSON.stringify(body)
   }
 

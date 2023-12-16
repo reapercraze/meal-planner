@@ -32,10 +32,9 @@ export function Home() {
 
   async function getUser() {
     try {
-      const responseJson = await makeRequest('/user/');
+      const responseJson = await makeRequest('/me/');
   
       if (!responseJson.error) {
-        console.log(responseJson)
         setUser(responseJson.user.first_name + " " + responseJson.user.last_name);
       } else {
         console.error(`Failed request. Status code: ${responseJson.status}`);
