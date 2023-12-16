@@ -1,21 +1,20 @@
 from django.shortcuts import render
-
-# Create your views here.
 from datetime import datetime, timedelta
 from django.shortcuts import render
 from django.conf import settings
 import json
 import os
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import User
 from core.models import MealWeek, MealDay, Recipe
 from django.forms import model_to_dict
-from django.http import JsonResponse
 import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.utils.decorators import method_decorator
-from rest_framework.authtoken.models import Token
 
 
 # Load manifest when the server launches
@@ -25,16 +24,43 @@ if not settings.DEBUG:
         MANIFEST = json.load(f)
 
 # Create your views here.
-        
-def index(req):
-    context = {
-        "asset_url": os.environ.get("ASSET_URL", ""),
-        "debug": settings.DEBUG,
-        "manifest": MANIFEST,
-        "js_file": "" if settings.DEBUG else MANIFEST["src/main.ts"]["file"],
-        "css_file": "" if settings.DEBUG else MANIFEST["src/main.ts"]["css"][0]
-    }
-    return render(req, "core/index.html", context)
+@api_view(['POST'])
+def register(request):
+    if request.method == "POST":
+        user = User.objects.create_user(
+            username=request.data.get("email"),
+            password=request.data.get("password"),
+            email=request.data.get("email"),
+            first_name=request.data.get("first_name"),
+            last_name=request.data.get("last_name")
+        )
+        login(request, user)
+
+        # Create a token for the new user
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key})
+
+    return Response({"error": "Invalid request"}, status=400)
+
+@api_view(['POST'])
+def sign_in(request):
+    if request.method == "POST":
+        user = authenticate(request, username=request.data.get("email"), password=request.data.get("password"))
+        if user is not None:
+            login(request, user)
+
+            # Fetch the token for the authenticated user
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({"token": token.key})
+
+        return Response({"error": "Invalid credentials"}, status=401)
+
+    return Response({"error": "Invalid request"}, status=400)
+
+@api_view(['POST'])
+def logout_view(request):
+    logout(request)
+    return Response({"success": True})
 
 @method_decorator(login_required, name='dispatch')
 @api_view(['POST'])
