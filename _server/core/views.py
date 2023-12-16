@@ -30,7 +30,7 @@ def index(req):
 
 @login_required
 def create_meal_week(request):
-    body = request.data
+    body = json.loads(request.body)
     
     meals = []
     for _ in range(7):
@@ -54,7 +54,7 @@ def create_meal_week(request):
 
 @login_required
 def get_meal_plan(request):
-    body = request.data
+    body = json.loads(request.body)
     user = request.user
     current_week_str = body.get("currentWeek")
 
@@ -71,7 +71,7 @@ def get_meal_plan(request):
 
 @login_required
 def get_meal(request):
-    body = request.data
+    body = json.loads(request.body)
     user = request.user
     meal_week_id = body["meal_week"]
     meal_day = body["meal_day"]
@@ -83,7 +83,7 @@ def get_meal(request):
 
 @login_required
 def add_recipe(request):
-    body = request.data
+    body = json.loads(request.body)
     
     recipe = Recipe(
         title=body["title"],
@@ -100,7 +100,7 @@ def me(request):
 @login_required
 def search_recipies(request):
     #got to api to get recipies
-    body = request.data
+    body = json.loads(request.body)
     query = body["query"]
     
     api_key = os.environ.get("SPOONACULAR_API_KEY")
