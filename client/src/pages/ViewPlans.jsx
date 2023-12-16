@@ -30,9 +30,6 @@ export function ViewPlans() {
     }
   }
   
-  
-  
-
   async function createNewWeek() {
     // Get CSRF token from cookies
     const parsedCookie = cookie.parse(document.cookie);
@@ -57,7 +54,6 @@ export function ViewPlans() {
         body: JSON.stringify({
           title: weekTitle,
           mondayDate: getMostRecentMonday()
-          
         }),
       });
   
@@ -71,7 +67,6 @@ export function ViewPlans() {
     }
   }
   
-
   async function logout() {
     const res = await fetch("/registration/logout/", {
       credentials: "same-origin", // include cookies!
@@ -106,19 +101,11 @@ export function ViewPlans() {
     setCurrentWeek(nextWeek);
   };
 
-  async function getRecipe() {
-    try {
-      const responseJson = await makeRequest('/random_recipe/');
+  function getDayOfWeek(day) {
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    return daysOfWeek[day];
+  }
   
-      if (!responseJson.error) {
-        setRandomRecipe(responseJson.recipe.recipes[0]);
-      } else {
-        console.error(`Failed request. Status code: ${responseJson.status}`);
-      }
-    } catch (error) {
-      console.error('Error fetching random recipe:', error);
-    }
-  };
 
   return (
     <>
@@ -144,25 +131,28 @@ export function ViewPlans() {
               <button onClick={goToNextWeek} className={styles.weekButton}>&gt;</button>
             </div>
             <div className={styles.mealDisplay}>
-              {mealWeeks.length > 0 ? (
-                mealWeeks.map((mealWeek) => (
-                  <div key={mealWeek.id} className={styles.mealPlan} onClick={() => handleMealPlanClick(mealWeek)}>
-                    <h2>{mealWeek.title}</h2>
-                    <div className={styles.daysContainer}>
-                      {mealWeek.days.map((day, index) => (
-                        <div key={index} className={styles.dayBox} onClick={(e) => handleDayBoxClick(e, mealWeek, day)}>
-                          <h3>{getDayOfWeek(index)}</h3>
+            {mealWeeks.length > 0 ? (
+              mealWeeks.map((mealWeek) => (
+                <div key={mealWeek.id} className={styles.mealPlan} onClick={() => handleMealPlanClick(mealWeek)}>
+                  <h2>{mealWeek.title}</h2>
+                  <div className={styles.daysContainer}>
+                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((dayOfWeek) => {
+                      const dayContent = `${mealWeek}.${dayOfWeek}`;
+                      return (
+                        <div key={dayOfWeek} className={styles.dayBox} onClick={(e) => handleDayBoxClick(e, mealWeek, dayOfWeek)}>
+                          <h3 className={styles.dayOfWeek}>{dayOfWeek}</h3>
                           <div className={styles.mealsContainer}>
-                            <p>Breakfast: {day.breakfast}</p>
-                            <p>Lunch: {day.lunch}</p>
-                            <p>Dinner: {day.dinner}</p>
+                            <p>B: {dayContent.breakfast}</p>
+                            <p>L: {dayContent.lunch}</p>
+                            <p>D: {dayContent.dinner}</p>
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })}
                   </div>
-                ))
-              ) : (
+                </div>
+              ))
+            ) : (
                 // if there are no plans available for the week
                 <div>
                   <p className={styles.errorMessage}>Uh oh! Looks like you don't have a plan for this week!</p>

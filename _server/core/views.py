@@ -38,13 +38,11 @@ def create_meal_week(request):
         meal_day = MealDay.objects.create()
         meals.append(meal_day)
 
-    print(request.user)
-
-    # user = User.objects.get(id=body.user.id)
+    user = User.objects.get(id=request.user.id)
 
     meal_week = MealWeek(
-        # user=user,
-        title=body[0],
+        user=user,
+        title=body['title'],
         monday=meals[0],
         tuesday=meals[1],
         wednesday=meals[2],
@@ -52,7 +50,7 @@ def create_meal_week(request):
         friday=meals[4],
         saturday=meals[5],
         sunday=meals[6],
-        monday_date=body[1],
+        monday_date=body['mondayDate'],
     )
     meal_week.save()
     return JsonResponse({"meal_week": model_to_dict(meal_week)})
