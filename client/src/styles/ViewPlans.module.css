@@ -121,5 +121,59 @@ background-color: wheat;
     text-align: center;
 }
 
+.modalPlease {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 997; /* Ensure the modal appears on top of other elements */
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    backdrop-filter: blur(5px); /* Add blur effect to the background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 998; /* Ensure the overlay is behind the modal but above other elements */
+}
+
+.modal {
+    background-color: wheat;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    width: 500px;
+    height: 500px;
+    color: black;
+    font-size: 20px;
+}
+
+.modalTitle {
+    text-align: center;
+    font-size: 40px;
+    padding: 0;
+    margin: 0; 
+    margin-top: 10px;
+}
+
+.modalButton {
+    background-color: green;
+}
+
+.modalFindRecipe {
+    z-index: 999;;
+    background-color: green;
+    width: 250px;
+}
+
 
     
